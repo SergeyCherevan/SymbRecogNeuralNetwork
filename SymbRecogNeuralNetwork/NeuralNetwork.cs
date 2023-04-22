@@ -8,6 +8,8 @@ namespace SymbRecogNeuralNetwork
 {
     public class NeuralNetwork
     {
+        public Dictionary<int, string> LabelMapping { get; set; }
+
         public Neuron[] InputLayer { get; private set; }
         public Neuron[] HiddenLayer { get; private set; }
         public Neuron[] OutputLayer { get; private set; }
@@ -45,15 +47,18 @@ namespace SymbRecogNeuralNetwork
             LearningRate = learningRate;
         }
 
-        public void Train(Dictionary<ImageMatrix, SymbolEnum> data)
+        public void Train(Dictionary<ImageMatrix, string> data)
         {
             // обучение сети
             for (int i = 0; i < Epochs; i++)
             {
                 Console.WriteLine($"Начинается эпоха {i}");
 
+                int j = 0;
                 foreach (var item in data)
                 {
+                    Console.WriteLine($"Изображение №{j}, символ \"{item.Value}\"");
+
                     // прямое распространение сигнала
                     Feedforward(item.Key.ToNormalizedArray());
 
@@ -62,13 +67,15 @@ namespace SymbRecogNeuralNetwork
 
                     // обновление весов нейронов
                     UpdateWeights();
+
+                    j++;
                 }
 
                 Console.WriteLine($"Заканчивается эпоха {i}");
             }
         }
 
-        public SymbolEnum Recognize(ImageMatrix image, double threshold)
+        public string Recognize(ImageMatrix image, double threshold)
         {
             // создаем массив значений пикселей изображения
             double[] inputs = image.ToNormalizedArray();
@@ -89,12 +96,10 @@ namespace SymbRecogNeuralNetwork
             // если значение активации наибольшего нейрона меньше порогового значения, то считаем, что символ не распознан
             if (OutputLayer[maxIndex].LastActivation < threshold)
             {
-                return SymbolEnum.Unknown;
+                return "Unknown";
             }
 
-            SymbolEnum[] values = Enum.GetValues<SymbolEnum>();
-
-            return values[maxIndex];
+            return LabelMapping[maxIndex];
 
         }
 
@@ -187,10 +192,9 @@ namespace SymbRecogNeuralNetwork
             return inputs;
         }
 
-        private double[] GetExpectedOutput(SymbolEnum symbol)
+        private double[] GetExpectedOutput(string symbol)
         {
-            SymbolEnum[] values = Enum.GetValues<SymbolEnum>();
-            int symbolIndex = Array.IndexOf(values, symbol);
+            int symbolIndex = LabelMapping.First(pair => pair.Value == symbol).Key;
 
             double[] output = new double[OutputLayer.Length];
             output[symbolIndex] = 1;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SymbRecogNeuralNetwork
 {
@@ -10,72 +9,124 @@ namespace SymbRecogNeuralNetwork
     {
         static void Main(string[] args)
         {
-            var trainingData = ReadDataFromImages("./TrainingData/");
+            string projectDirectory = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..");
+            Environment.CurrentDirectory = projectDirectory;
+
+            Dictionary<int, string> symbols = LoadEmnistLabelMapping("./Data/emnist-balanced-mapping.txt");
+
+            Dictionary<ImageMatrix, string> trainingData = LoadEmnistData(
+                "./Data/emnist-balanced-train-images-idx3-ubyte",
+                "./Data/emnist-balanced-train-labels-idx1-ubyte",
+                "./Data/emnist-balanced-mapping.txt"
+            );
+
+            Console.WriteLine($"Тренировочный датасет содержит {trainingData.Count} изображений для {symbols.Count} символов");
 
             NeuralNetwork neuralNetwork = new NeuralNetwork(
                 inputCount: trainingData.First().Key.ToNormalizedArray().Length,
                 hiddenCount: 4,
-                outputCount: Enum.GetNames(typeof(SymbolEnum)).Length - 1,
-                epochs: 10000,
+                outputCount: symbols.Count,
+                epochs: 1,
                 learningRate: 0.1
             );
 
+            neuralNetwork.LabelMapping = symbols;
+
             neuralNetwork.Train(trainingData);
 
-            Console.WriteLine("Обучение завершено.");
+            Console.WriteLine("Обучение завершено.\nНажмите любой символ, чтобы начать тестирование модели.");
 
-            var testingData = ReadDataFromImages("./TestingData/");
-            foreach ((ImageMatrix image, SymbolEnum expectedSymbol) in testingData)
+            Console.ReadKey();
+
+            Dictionary<ImageMatrix, string> testingData = LoadEmnistData(
+                "./Data/emnist-balanced-test-images-idx3-ubyte",
+                "./Data/emnist-balanced-test-labels-idx1-ubyte",
+                "./Data/emnist-balanced-mapping.txt"
+            );
+
+            Console.WriteLine($"Тестовый датасет содержит {testingData.Count} изображений для {symbols.Count} символов");
+
+            int j = 0;
+
+            foreach ((ImageMatrix image, string expectedSymbol) in testingData)
             {
-                SymbolEnum result = neuralNetwork.Recognize(image, threshold: 0.5);
+                string result = neuralNetwork.Recognize(image, threshold: 0.01);
 
-                Console.WriteLine($"Распознанный символ: {result}, ожидаемый символ: {expectedSymbol}");
+                Console.WriteLine($"№{j} Распознанный символ: {result}, ожидаемый символ: {expectedSymbol}");
+
+                j++;
             }
 
+            Console.WriteLine("Тестирование завершено.\nНажмите любой символ, чтобы завершить программу.");
             Console.ReadLine();
         }
 
-
-        private static Dictionary<ImageMatrix, SymbolEnum> ReadDataFromFiles(string dataPath)
+        public static Dictionary<int, string> LoadEmnistLabelMapping(string mappingFilePath)
         {
-            Dictionary<ImageMatrix, SymbolEnum> trainingData = new Dictionary<ImageMatrix, SymbolEnum>();
+            Dictionary<int, string> symbols = new Dictionary<int, string>();
 
-            string[] fileNames = Directory.GetFiles(dataPath, "*.txt");
-
-            foreach (string fileName in fileNames)
+            using (StreamReader reader = new StreamReader(mappingFilePath))
             {
-                string[] parts = Path.GetFileNameWithoutExtension(fileName).Split('.');
-                SymbolEnum symbol = (SymbolEnum)char.ConvertToUtf32(parts[0], 0);
-                int version = int.Parse(parts[1]);
+                string line;
 
-                string[] lines = File.ReadAllLines(fileName).ToArray();
-                ImageMatrix matrix = new ImageMatrix(lines);
+                while ((line = reader.ReadLine()) != null)
+                {
+                    string[] parts = line.Split(' ');
 
-                trainingData[matrix] = symbol;
+                    int label = int.Parse(parts[0]);
+                    int unicodeValue = int.Parse(parts[1]);
+
+                    char symbol = char.ConvertFromUtf32(unicodeValue)[0];
+                    symbols.Add(label, symbol.ToString());
+                }
             }
 
-            return trainingData;
+            return symbols;
         }
 
-        private static Dictionary<ImageMatrix, SymbolEnum> ReadDataFromImages(string dataPath)
+
+        public static Dictionary<ImageMatrix, string> LoadEmnistData(string imagesFilePath, string labelsFilePath, string mappingFilePath)
         {
-            Dictionary<ImageMatrix, SymbolEnum> trainingData = new Dictionary<ImageMatrix, SymbolEnum>();
+            Dictionary<int, string> labelMapping = LoadEmnistLabelMapping(mappingFilePath);
 
-            string[] fileNames = Directory.GetFiles(dataPath, "*.bmp");
+            Dictionary<ImageMatrix, string> data = new Dictionary<ImageMatrix, string>();
 
-            foreach (string fileName in fileNames)
+            // Read labels file and corresponding images
+            using (BinaryReader imagesReader = new BinaryReader(File.OpenRead(imagesFilePath)))
+            using (BinaryReader labelsReader = new BinaryReader(File.OpenRead(labelsFilePath)))
             {
-                string[] parts = Path.GetFileNameWithoutExtension(fileName).Split('.');
-                SymbolEnum symbol = (SymbolEnum)char.ConvertToUtf32(parts[0], 0);
-                int version = int.Parse(parts[1]);
+                int magicNumber = ReadInt32BigEndian(imagesReader);
+                int numberOfImages = ReadInt32BigEndian(imagesReader);
+                int rows = ReadInt32BigEndian(imagesReader);
+                int cols = ReadInt32BigEndian(imagesReader);
+                int labelMagicNumber = ReadInt32BigEndian(labelsReader);
+                int numberOfLabels = ReadInt32BigEndian(labelsReader);
 
-                ImageMatrix matrix = new ImageMatrix(fileName);
+                if (numberOfImages != numberOfLabels)
+                {
+                    throw new Exception("Number of images and labels does not match");
+                }
 
-                trainingData[matrix] = symbol;
+                for (int i = 0; i < numberOfImages; i++)
+                {
+                    byte[] pixels = imagesReader.ReadBytes(rows * cols);
+                    byte label = labelsReader.ReadByte();
+
+                    string symbol = labelMapping[label];
+
+                    ImageMatrix imageMatrix = new ImageMatrix(rows, cols, pixels);
+                    data[imageMatrix] = symbol;
+                }
             }
 
-            return trainingData;
+            return data;
         }
 
+        public static int ReadInt32BigEndian(BinaryReader reader)
+        {
+            byte[] bytes = reader.ReadBytes(4);
+            Array.Reverse(bytes);
+            return BitConverter.ToInt32(bytes, 0);
+        }
     }
 }
