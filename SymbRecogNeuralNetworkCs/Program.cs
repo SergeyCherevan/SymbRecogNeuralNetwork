@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SymbRecogNeuralNetwork
+namespace SymbRecogNeuralNetworkCs
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            string projectDirectory = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..");
+            string projectDirectory = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..");
             Environment.CurrentDirectory = projectDirectory;
 
             Dictionary<int, string> symbols = LoadEmnistLabelMapping("./Data/emnist-balanced-mapping.txt");
@@ -32,7 +32,7 @@ namespace SymbRecogNeuralNetwork
                     inputCount: trainingData.First().Key.ToNormalizedArray().Length,
                     hiddenCount: 4,
                     outputCount: symbols.Count,
-                    epochs: 0,
+                    epochs: 20,
                     learningRate: 0.1
                 );
 

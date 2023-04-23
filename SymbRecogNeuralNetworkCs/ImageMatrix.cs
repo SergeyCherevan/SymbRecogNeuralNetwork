@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace SymbRecogNeuralNetwork
+namespace SymbRecogNeuralNetworkCs
 {
     public class ImageMatrix
     {

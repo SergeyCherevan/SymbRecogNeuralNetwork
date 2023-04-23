@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/SymbRecogNeuralNetwork/SymbRecogNeuralNetwork.csproj",
+                "${workspaceFolder}/SymbRecogNeuralNetworkCs/SymbRecogNeuralNetworkCs.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/SymbRecogNeuralNetwork/SymbRecogNeuralNetwork.csproj",
+                "${workspaceFolder}/SymbRecogNeuralNetworkCs/SymbRecogNeuralNetworkCs.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/SymbRecogNeuralNetwork/SymbRecogNeuralNetwork.csproj"
+                "${workspaceFolder}/SymbRecogNeuralNetworkCs/SymbRecogNeuralNetworkCs.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

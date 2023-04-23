@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SymbRecogNeuralNetwork
+namespace SymbRecogNeuralNetworkCs
 {
     [Serializable]
     public class Neuron
