@@ -32,7 +32,7 @@ namespace SymbRecogNeuralNetworkCs
                     inputCount: trainingData.First().Key.ToNormalizedArray().Length,
                     hiddenCount: 20,
                     outputCount: symbols.Count,
-                    epochs: 0,
+                    epochs: 100,
                     learningRate: 0.01
                 );
 
