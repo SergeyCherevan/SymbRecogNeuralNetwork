@@ -30,10 +30,10 @@ namespace SymbRecogNeuralNetworkCs
 
                 neuralNetwork = new NeuralNetwork(
                     inputCount: trainingData.First().Key.ToNormalizedArray().Length,
-                    hiddenCount: 4,
+                    hiddenCount: 20,
                     outputCount: symbols.Count,
-                    epochs: 20,
-                    learningRate: 0.1
+                    epochs: 100,
+                    learningRate: 0.01
                 );
 
                 neuralNetwork.LabelMapping = symbols;
