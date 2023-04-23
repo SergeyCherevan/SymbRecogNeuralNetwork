@@ -1,24 +1,23 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
+
+using Newtonsoft.Json;
 
 namespace SymbRecogNeuralNetworkCs
 {
-    [Serializable]
     public class NeuralNetwork
     {
         public Dictionary<int, string> LabelMapping { get; set; }
 
-        public Neuron[] InputLayer { get; private set; }
-        public Neuron[] HiddenLayer { get; private set; }
-        public Neuron[] OutputLayer { get; private set; }
+        public Neuron[] InputLayer { get; set; }
+        public Neuron[] HiddenLayer { get; set; }
+        public Neuron[] OutputLayer { get; set; }
 
-        public int Epochs { get; private set; }
-        public double LearningRate { get; private set; }
+        public int Epochs { get; set; }
+        public double LearningRate { get; set; }
 
 
 
@@ -212,33 +211,25 @@ namespace SymbRecogNeuralNetworkCs
         // метод сохранения модели в файл
         public void SaveToFile(string filePath)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-
-            // открываем файл для записи
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                formatter.Serialize(fileStream, this);
-            }
+            string jsonData = JsonConvert.SerializeObject(this, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(filePath, jsonData);
         }
 
         // метод загрузки модели из файла
         public void ReadFromFile(string filePath)
         {
-            BinaryFormatter formatter = new BinaryFormatter();
+            string jsonData = File.ReadAllText(filePath);
+            NeuralNetwork network = JsonConvert.DeserializeObject<NeuralNetwork>(jsonData);
 
-            // открываем файл для чтения
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
-            {
-                NeuralNetwork network = (NeuralNetwork)formatter.Deserialize(fileStream);
+            // здесь вы можете скопировать данные из deserializedNetwork в текущий экземпляр класса NeuralNetwork
+            LabelMapping = network.LabelMapping;
 
-                // копируем значения из загруженной модели в текущую модель
-                // пример копирования полей:
-                InputLayer = network.InputLayer;
-                HiddenLayer = network.HiddenLayer;
-                OutputLayer = network.OutputLayer;
-                Epochs = network.Epochs;
-                LearningRate = network.LearningRate;
-            }
+            InputLayer = network.InputLayer;
+            HiddenLayer = network.HiddenLayer;
+            OutputLayer = network.OutputLayer;
+
+            Epochs = network.Epochs;
+            LearningRate = network.LearningRate;
         }
     }
 }

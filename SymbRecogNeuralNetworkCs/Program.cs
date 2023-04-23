@@ -32,7 +32,7 @@ namespace SymbRecogNeuralNetworkCs
                     inputCount: trainingData.First().Key.ToNormalizedArray().Length,
                     hiddenCount: 20,
                     outputCount: symbols.Count,
-                    epochs: 100,
+                    epochs: 0,
                     learningRate: 0.01
                 );
 
@@ -48,8 +48,6 @@ namespace SymbRecogNeuralNetworkCs
                 string fileName = Console.ReadLine();
 
                 neuralNetwork.ReadFromFile($"./Data/{fileName}");
-
-                neuralNetwork.LabelMapping = symbols;
 
                 Console.WriteLine("Чтение сохранённых весов нейросети завершено.");
             }

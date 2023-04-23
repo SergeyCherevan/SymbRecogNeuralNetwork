@@ -12,7 +12,7 @@ namespace SymbRecogNeuralNetworkCs
         public double[] Weights { get; set; } // веса нейрона
         public double Bias { get; set; } // смещение нейрона
 
-        public double LastActivation { get; private set; } // последнее значение активации нейрона
+        public double LastActivation { get; set; } // последнее значение активации нейрона
         public double LastError { get; set; } // последнее значение ошибки при активации нейрона
 
         public Neuron(int inputCount)
