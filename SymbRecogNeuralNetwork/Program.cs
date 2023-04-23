@@ -16,9 +16,9 @@ namespace SymbRecogNeuralNetwork
 
             NeuralNetwork neuralNetwork = new NeuralNetwork();
 
-            Console.WriteLine("На основе чего настраивать нейросеть?");
+            Console.WriteLine("На основе чего настраивать нейросеть: датасет изображений (d) или файл с весами нейросети (f)?");
             string doReadTrainingDatasetOrNeuralNetworkWeights = Console.ReadLine();
-            if (doReadTrainingDatasetOrNeuralNetworkWeights == "Датасет изображений")
+            if (doReadTrainingDatasetOrNeuralNetworkWeights == "d")
             {
                 Dictionary<ImageMatrix, string> trainingData = LoadEmnistData(
                     "./Data/emnist-balanced-train-images-idx3-ubyte",
@@ -32,7 +32,7 @@ namespace SymbRecogNeuralNetwork
                     inputCount: trainingData.First().Key.ToNormalizedArray().Length,
                     hiddenCount: 4,
                     outputCount: symbols.Count,
-                    epochs: 10,
+                    epochs: 0,
                     learningRate: 0.1
                 );
 
@@ -42,12 +42,14 @@ namespace SymbRecogNeuralNetwork
 
                 Console.WriteLine("Обучение завершено.");
             }
-            else if (doReadTrainingDatasetOrNeuralNetworkWeights == "Сохранённые веса нейросети" || true)
+            else if (doReadTrainingDatasetOrNeuralNetworkWeights == "f")
             {
                 Console.WriteLine("Напишите название файла с сохранёнными весами нейросети?");
                 string fileName = Console.ReadLine();
 
                 neuralNetwork.ReadFromFile($"./Data/{fileName}");
+
+                neuralNetwork.LabelMapping = symbols;
 
                 Console.WriteLine("Чтение сохранённых весов нейросети завершено.");
             }
@@ -76,9 +78,9 @@ namespace SymbRecogNeuralNetwork
 
             Console.WriteLine("Тестирование завершено.");
 
-            Console.WriteLine("Вы хотите записать веса текущей нейросети в файл?");
+            Console.WriteLine("Вы хотите записать веса текущей нейросети в файл (y/n)?");
             string doWriteWeightsToFile = Console.ReadLine();
-            if (doWriteWeightsToFile == "Да")
+            if (doWriteWeightsToFile == "y")
             {
                 Console.WriteLine("Напишите название файла для сохранения весов нейросети?");
                 string fileName = Console.ReadLine();
