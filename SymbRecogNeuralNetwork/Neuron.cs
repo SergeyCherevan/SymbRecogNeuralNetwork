@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SymbRecogNeuralNetwork
 {
+    [Serializable]
     public class Neuron
     {
         public double[] Weights { get; set; } // веса нейрона

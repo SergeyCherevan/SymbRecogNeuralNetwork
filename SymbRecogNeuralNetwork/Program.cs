@@ -14,28 +14,45 @@ namespace SymbRecogNeuralNetwork
 
             Dictionary<int, string> symbols = LoadEmnistLabelMapping("./Data/emnist-balanced-mapping.txt");
 
-            Dictionary<ImageMatrix, string> trainingData = LoadEmnistData(
-                "./Data/emnist-balanced-train-images-idx3-ubyte",
-                "./Data/emnist-balanced-train-labels-idx1-ubyte",
-                "./Data/emnist-balanced-mapping.txt"
-            );
+            NeuralNetwork neuralNetwork = new NeuralNetwork();
 
-            Console.WriteLine($"Тренировочный датасет содержит {trainingData.Count} изображений для {symbols.Count} символов");
+            Console.WriteLine("На основе чего настраивать нейросеть?");
+            string doReadTrainingDatasetOrNeuralNetworkWeights = Console.ReadLine();
+            if (doReadTrainingDatasetOrNeuralNetworkWeights == "Датасет изображений")
+            {
+                Dictionary<ImageMatrix, string> trainingData = LoadEmnistData(
+                    "./Data/emnist-balanced-train-images-idx3-ubyte",
+                    "./Data/emnist-balanced-train-labels-idx1-ubyte",
+                    "./Data/emnist-balanced-mapping.txt"
+                );
 
-            NeuralNetwork neuralNetwork = new NeuralNetwork(
-                inputCount: trainingData.First().Key.ToNormalizedArray().Length,
-                hiddenCount: 4,
-                outputCount: symbols.Count,
-                epochs: 1,
-                learningRate: 0.1
-            );
+                Console.WriteLine($"Тренировочный датасет содержит {trainingData.Count} изображений для {symbols.Count} символов");
 
-            neuralNetwork.LabelMapping = symbols;
+                neuralNetwork = new NeuralNetwork(
+                    inputCount: trainingData.First().Key.ToNormalizedArray().Length,
+                    hiddenCount: 4,
+                    outputCount: symbols.Count,
+                    epochs: 10,
+                    learningRate: 0.1
+                );
 
-            neuralNetwork.Train(trainingData);
+                neuralNetwork.LabelMapping = symbols;
 
-            Console.WriteLine("Обучение завершено.\nНажмите любой символ, чтобы начать тестирование модели.");
+                neuralNetwork.Train(trainingData);
 
+                Console.WriteLine("Обучение завершено.");
+            }
+            else if (doReadTrainingDatasetOrNeuralNetworkWeights == "Сохранённые веса нейросети" || true)
+            {
+                Console.WriteLine("Напишите название файла с сохранёнными весами нейросети?");
+                string fileName = Console.ReadLine();
+
+                neuralNetwork.ReadFromFile($"./Data/{fileName}");
+
+                Console.WriteLine("Чтение сохранённых весов нейросети завершено.");
+            }
+
+            Console.WriteLine("Нажмите любой символ, чтобы начать тестирование модели.");
             Console.ReadKey();
 
             Dictionary<ImageMatrix, string> testingData = LoadEmnistData(
@@ -57,8 +74,22 @@ namespace SymbRecogNeuralNetwork
                 j++;
             }
 
-            Console.WriteLine("Тестирование завершено.\nНажмите любой символ, чтобы завершить программу.");
-            Console.ReadLine();
+            Console.WriteLine("Тестирование завершено.");
+
+            Console.WriteLine("Вы хотите записать веса текущей нейросети в файл?");
+            string doWriteWeightsToFile = Console.ReadLine();
+            if (doWriteWeightsToFile == "Да")
+            {
+                Console.WriteLine("Напишите название файла для сохранения весов нейросети?");
+                string fileName = Console.ReadLine();
+
+                neuralNetwork.SaveToFile($"./Data/{fileName}");
+
+                Console.WriteLine("Запись весов нейросети в файл завершена.");
+            }
+
+            Console.WriteLine("Нажмите любой символ, чтобы завершить программу.");
+            Console.ReadKey();
         }
 
         public static Dictionary<int, string> LoadEmnistLabelMapping(string mappingFilePath)

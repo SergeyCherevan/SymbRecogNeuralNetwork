@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace SymbRecogNeuralNetwork
 {
+    [Serializable]
     public class NeuralNetwork
     {
         public Dictionary<int, string> LabelMapping { get; set; }
@@ -18,6 +21,8 @@ namespace SymbRecogNeuralNetwork
         public double LearningRate { get; private set; }
 
 
+
+        public NeuralNetwork() { }
 
         public NeuralNetwork(int inputCount, int hiddenCount, int outputCount, int epochs, double learningRate)
         {
@@ -57,7 +62,7 @@ namespace SymbRecogNeuralNetwork
                 int j = 0;
                 foreach (var item in data)
                 {
-                    Console.WriteLine($"Изображение №{j}, символ \"{item.Value}\"");
+                    Console.WriteLine($"Эпоха {i}. Изображение №{j}, символ \"{item.Value}\"");
 
                     // прямое распространение сигнала
                     Feedforward(item.Key.ToNormalizedArray());
@@ -202,5 +207,38 @@ namespace SymbRecogNeuralNetwork
             return output;
         }
 
+        // класс описания нейронной сети
+
+        // метод сохранения модели в файл
+        public void SaveToFile(string filePath)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+
+            // открываем файл для записи
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                formatter.Serialize(fileStream, this);
+            }
+        }
+
+        // метод загрузки модели из файла
+        public void ReadFromFile(string filePath)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+
+            // открываем файл для чтения
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Open))
+            {
+                NeuralNetwork network = (NeuralNetwork)formatter.Deserialize(fileStream);
+
+                // копируем значения из загруженной модели в текущую модель
+                // пример копирования полей:
+                InputLayer = network.InputLayer;
+                HiddenLayer = network.HiddenLayer;
+                OutputLayer = network.OutputLayer;
+                Epochs = network.Epochs;
+                LearningRate = network.LearningRate;
+            }
+        }
     }
 }
