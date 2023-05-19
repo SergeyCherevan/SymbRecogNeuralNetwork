@@ -206,8 +206,6 @@ namespace SymbRecogNeuralNetworkCs
             return output;
         }
 
-        // класс описания нейронной сети
-
         // метод сохранения модели в файл
         public void SaveToFile(string filePath)
         {
