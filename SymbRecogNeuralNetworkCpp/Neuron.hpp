@@ -18,7 +18,7 @@ namespace SymbRecogNeuralNetworkCpp
         double LastActivation; // последнее значение активации нейрона
         double LastError; // последнее значение ошибки при активации нейрона
 
-        Neuron(int inputCount);
+        Neuron(int inputCount, std::string neuronType = "output");
         double Activate(const std::vector<double>& inputs);
 
     private:

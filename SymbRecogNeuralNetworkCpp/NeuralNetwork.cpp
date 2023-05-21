@@ -10,7 +10,7 @@ namespace SymbRecogNeuralNetworkCpp
     NeuralNetwork::NeuralNetwork() { }
 
     NeuralNetwork::NeuralNetwork(int inputCount, int hiddenCount, int outputCount, int epochs, double learningRate) :
-        InputLayer(inputCount, Neuron(1)), // инициализация входных нейронов
+        InputLayer(inputCount, Neuron(1, "input")), // инициализация входных нейронов
         HiddenLayer(hiddenCount, Neuron(inputCount)), // инициализация скрытых нейронов
         OutputLayer(outputCount, Neuron(hiddenCount)), // инициализация выходных нейронов
         Epochs(epochs),

@@ -32,7 +32,7 @@ namespace SymbRecogNeuralNetworkCs
             // инициализация входных нейронов
             for (int i = 0; i < inputCount; i++)
             {
-                InputLayer[i] = new Neuron(1); // входные нейроны имеют один вход
+                InputLayer[i] = new Neuron(1, "input"); // входные нейроны имеют один вход
             }
 
             // инициализация скрытых нейронов

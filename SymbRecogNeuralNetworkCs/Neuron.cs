@@ -15,10 +15,28 @@ namespace SymbRecogNeuralNetworkCs
         public double LastActivation { get; set; } // последнее значение активации нейрона
         public double LastError { get; set; } // последнее значение ошибки при активации нейрона
 
-        public Neuron(int inputCount)
+        public Neuron(int inputCount, string neuronType = "output")
         {
-            Weights = new double[inputCount];
-            Randomize();
+            if (neuronType == "input")
+            {
+                Weights = new double[] { 1.0 };
+                Bias = 0.0;
+            }
+            else
+            {
+                Weights = new double[inputCount];
+                Randomize();
+            }
+        }
+
+        private void Randomize()
+        {
+            Random random = new Random();
+
+            for (int i = 0; i < Weights.Length; i++)
+                Weights[i] = random.NextDouble() * 2 - 1;
+
+            Bias = random.NextDouble() * 2 - 1;
         }
 
         public double Activate(double[] inputs)
@@ -41,16 +59,6 @@ namespace SymbRecogNeuralNetworkCs
         private double Sigmoid(double x)
         {
             return 1.0 / (1.0 + Math.Exp(-x));
-        }
-
-        private void Randomize()
-        {
-            Random random = new Random();
-
-            for (int i = 0; i < Weights.Length; i++)
-                Weights[i] = random.NextDouble() * 2 - 1;
-
-            Bias = random.NextDouble() * 2 - 1;
         }
     }
 
