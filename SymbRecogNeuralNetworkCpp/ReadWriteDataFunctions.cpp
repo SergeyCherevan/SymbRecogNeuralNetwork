@@ -1,15 +1,15 @@
 #include <iostream>
 #include <fstream>
-#include <filesystem>
-#include <map>
+#include <vector>
+#include <unordered_map>
 
 #include "ReadWriteDataFunctions.hpp"
 
 namespace SymbRecogNeuralNetworkCpp
 {
-    std::map<int, std::string> LoadEmnistLabelMapping(const std::string& mappingFilePath)
+    std::unordered_map<int, std::string> LoadEmnistLabelMapping(const std::string& mappingFilePath)
     {
-        std::map<int, std::string> symbols;
+        std::unordered_map<int, std::string> symbols;
 
         std::ifstream input(mappingFilePath);
         if (!input.is_open())
@@ -22,21 +22,22 @@ namespace SymbRecogNeuralNetworkCpp
         while (input >> label >> unicodeValue)
         {
             char symbol = static_cast<char>(unicodeValue);
-            symbols.insert({ label, std::string(1, symbol) });
+            symbols.emplace(label, std::string(1, symbol));
         }
 
         return symbols;
     }
 
     // Функция для загрузки данных из файлов EMNIST
-    std::map<ImageMatrix, std::string> LoadEmnistData(
+    std::unordered_map<ImageMatrix, std::string> LoadEmnistData(
         const std::string& imagesFilePath,
         const std::string& labelsFilePath,
         const std::string& mappingFilePath)
     {
-        std::map<int, std::string> labelMapping = LoadEmnistLabelMapping(mappingFilePath);
+        std::unordered_map<int, std::string> labelMapping = LoadEmnistLabelMapping(mappingFilePath);
 
-        std::map<ImageMatrix, std::string> data;
+        std::unordered_map<ImageMatrix, std::string> data;
+        data.reserve(labelMapping.size()); // Предварительное выделение памяти
 
         // Чтение файлов изображений и меток
         std::ifstream imagesReader(imagesFilePath, std::ios::binary);
@@ -68,7 +69,7 @@ namespace SymbRecogNeuralNetworkCpp
             std::string symbol = labelMapping[static_cast<int>(label)];
 
             ImageMatrix imageMatrix(rows, cols, pixels);
-            data[imageMatrix] = symbol;
+            data.emplace(imageMatrix, std::move(symbol));
         }
 
         return data;

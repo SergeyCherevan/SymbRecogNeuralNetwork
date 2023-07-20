@@ -1,16 +1,16 @@
 #ifndef READWRITEDARAFUNCTIONS_HPP
 #define READWRITEDARAFUNCTIONS_HPP
 
-#include <map>
+#include <unordered_map>
 #include <fstream>
 
 #include "ImageMatrix.hpp"
 
 namespace SymbRecogNeuralNetworkCpp
 {
-    std::map<int, std::string> LoadEmnistLabelMapping(const std::string& mappingFilePath);
+    std::unordered_map<int, std::string> LoadEmnistLabelMapping(const std::string& mappingFilePath);
 
-    std::map<ImageMatrix, std::string> LoadEmnistData(
+    std::unordered_map<ImageMatrix, std::string> LoadEmnistData(
         const std::string& imagesFilePath,
         const std::string& labelsFilePath,
         const std::string& mappingFilePath);
