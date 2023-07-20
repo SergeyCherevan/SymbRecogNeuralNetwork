@@ -70,7 +70,7 @@ namespace SymbRecogNeuralNetworkCs
                     Backpropagate(GetExpectedOutput(item.Value));
 
                     // обновление весов нейронов
-                    UpdateWeights();
+                    UpdateWeightsAndBiases();
 
                     j++;
                 }
@@ -154,7 +154,7 @@ namespace SymbRecogNeuralNetworkCs
             }
         }
 
-        private void UpdateWeights()
+        private void UpdateWeightsAndBiases()
         {
             // обновляем веса скрытых нейронов
             for (int i = 0; i < HiddenLayer.Length; i++)
