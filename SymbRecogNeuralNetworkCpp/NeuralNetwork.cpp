@@ -35,7 +35,7 @@ namespace SymbRecogNeuralNetworkCpp
                 Backpropagate(GetExpectedOutput(label));
 
                 // обновление весов нейронов
-                UpdateWeights();
+                UpdateWeightsAndBiases();
 
                 j++;
             }
@@ -142,7 +142,7 @@ namespace SymbRecogNeuralNetworkCpp
         }
     }
 
-    void NeuralNetwork::UpdateWeights()
+    void NeuralNetwork::UpdateWeightsAndBiases()
     {
         // обновляем веса скрытых нейронов
         for (size_t i = 0; i < HiddenLayer.size(); i++)

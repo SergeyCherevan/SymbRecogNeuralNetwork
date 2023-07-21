@@ -2,7 +2,7 @@
 
 namespace SymbRecogNeuralNetworkCpp
 {
-    Neuron::Neuron(int inputCount, std::string neuronType = "output") {
+    Neuron::Neuron(int inputCount, std::string neuronType) {
         if (neuronType == "input") {
             Weights = std::vector<double>(1);
             Bias = 0.0;

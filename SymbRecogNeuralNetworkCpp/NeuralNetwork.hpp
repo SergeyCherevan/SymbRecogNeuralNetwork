@@ -36,7 +36,7 @@ namespace SymbRecogNeuralNetworkCpp
         std::vector<double> GetInputs(const std::vector<Neuron>& layer) const;
         void Backpropagate(const std::vector<double>& expected);
         std::vector<double> GetExpectedOutput(std::string label) const;
-        void UpdateWeights();
+        void UpdateWeightsAndBiases();
     };
 }
 
